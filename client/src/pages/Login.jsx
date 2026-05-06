@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/axios'
 
+const SHOW_DEMO_ACCOUNTS = false;
+
+
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -61,11 +64,13 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
-          <div className="mt-5 p-3 bg-gray-50 rounded-lg text-xs text-gray-500">
-            <p className="font-medium mb-1">Demo accounts:</p>
-            <p>Admin: admin@demo.com / admin123</p>
-            <p>Member: alice@demo.com / member123</p>
-          </div>
+          {SHOW_DEMO_ACCOUNTS && (
+            <div className="mt-5 p-3 bg-gray-50 rounded-lg text-xs text-gray-500">
+              <p className="font-medium mb-1">Demo accounts:</p>
+              <p>Admin: admin@demo.com / admin123</p>
+              <p>Member: alice@demo.com / member123</p>
+            </div>
+          )}
         </div>
         <p className="text-center text-sm text-gray-500 mt-4">
           No account? <Link to="/register" className="text-indigo-600 hover:underline">Register here</Link>
