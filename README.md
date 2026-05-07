@@ -1,13 +1,9 @@
 # TaskFlow — Team Task Manager
 
-A full-stack web app for managing projects, assigning tasks, and tracking progress with role-based access control (Admin/Member).
+A full-stack team collaboration app for managing projects, assigning tasks, and tracking progress — with role-based access control for Admins and Members.
 
-## Live Demo
+🔗 **Live Demo:** [taskflow-production-7266.up.railway.app](https://taskflow-production-7266.up.railway.app/login)
 
-- **Frontend:** [your-frontend-url.vercel.app](https://your-frontend-url.vercel.app)
-- **Backend API:** [your-backend-url.railway.app](https://your-backend-url.railway.app)
-
-**Demo accounts:**
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | admin@demo.com | admin123 |
@@ -18,151 +14,24 @@ A full-stack web app for managing projects, assigning tasks, and tracking progre
 
 ## Features
 
-- **Authentication** — Register/Login with JWT. Passwords hashed with bcrypt.
-- **Role-based access** — Admins create projects, manage members, create/delete tasks. Members update task status only.
-- **Project management** — Create projects, add/remove members by email.
-- **Task management** — Create tasks with title, description, due date, assignee. Kanban board (Todo / In Progress / Done).
-- **Overdue tracking** — Tasks past due date highlighted red on dashboard and board.
-- **Dashboard** — Live stats: total tasks, done, in progress, overdue. Recent task feed.
+- **JWT Authentication** — Secure register/login flow with bcrypt password hashing
+- **Role-Based Access Control** — Admins manage projects and tasks; Members update task status only
+- **Project Management** — Create projects, invite members by email, mark projects as complete or on hold
+- **Task Board** — Kanban-style board with columns: Todo → In Progress → Pending Confirmation → Done
+- **Overdue Tracking** — Tasks past their due date are highlighted in red across the board and dashboard
+- **Dashboard** — Live stats showing total tasks, completed, in progress, and overdue counts with a recent activity feed
 
 ---
 
 ## Tech Stack
 
-**Backend**
-- Node.js + Express
-- PostgreSQL + Prisma ORM
-- JWT authentication + bcryptjs
-- Zod validation
-
-**Frontend**
-- React 18 + Vite
-- Tailwind CSS
-- React Router v6
-- Axios
-
-**Deployment**
-- Backend: Railway
-- Frontend: Vercel
-- Database: Railway PostgreSQL
-
----
-
-## Local Setup
-
-### Prerequisites
-- Node.js 18+
-- PostgreSQL (or use Railway free tier)
-
-### 1. Clone the repo
-```bash
-git clone https://github.com/yourusername/team-task-manager.git
-cd team-task-manager
-```
-
-### 2. Backend setup
-```bash
-cd server
-npm install
-
-# Copy env file and fill in your values
-copy .env.example .env
-```
-
-Edit `server/.env`:
-```
-DATABASE_URL="postgresql://user:password@localhost:5432/taskmanager"
-JWT_SECRET="your-secret-key-here"
-PORT=5000
-```
-
-```bash
-# Run database migrations
-npx prisma migrate dev --name init
-
-# Seed demo data
-npm run db:seed
-
-# Start server
-npm run dev
-```
-
-### 3. Frontend setup
-```bash
-cd ../client
-npm install
-
-# Copy env file
-copy .env.example .env
-```
-
-Edit `client/.env`:
-```
-VITE_API_URL=http://localhost:5000/api
-```
-
-```bash
-npm run dev
-```
-
-Open http://localhost:5173
-
----
-
-## API Endpoints
-
-### Auth
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| POST | /api/auth/register | Public | Register new user |
-| POST | /api/auth/login | Public | Login, returns JWT |
-| GET | /api/auth/me | Auth | Get current user |
-
-### Projects
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | /api/projects | Auth | Get all projects for user |
-| POST | /api/projects | Admin | Create project |
-| GET | /api/projects/:id | Auth | Get project + tasks + members |
-| DELETE | /api/projects/:id | Admin | Delete project |
-| POST | /api/projects/:id/members | Admin | Add member by email |
-| DELETE | /api/projects/:id/members/:userId | Admin | Remove member |
-
-### Tasks
-| Method | Endpoint | Access | Description |
-|--------|----------|--------|-------------|
-| GET | /api/tasks/dashboard | Auth | Get dashboard stats |
-| GET | /api/tasks/project/:projectId | Auth | Get tasks for project |
-| POST | /api/tasks/project/:projectId | Admin | Create task |
-| PATCH | /api/tasks/:id | Auth | Update task (status/details) |
-| DELETE | /api/tasks/:id | Admin | Delete task |
-
----
-
-## Database Schema
-
-```
-User         — id, name, email, password, role (ADMIN/MEMBER)
-Project      — id, name, description, adminId
-ProjectMember— projectId, userId (join table)
-Task         — id, title, description, status, dueDate, projectId, assigneeId
-```
-
----
-
-## Deployment (Railway)
-
-1. Push to GitHub
-2. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub
-3. Add PostgreSQL plugin
-4. Set env vars: `DATABASE_URL`, `JWT_SECRET`, `PORT`, `CLIENT_URL`
-5. Add to `package.json` scripts: `"start": "node src/index.js"`
-6. Railway runs `npm install` then `npm start` automatically
-7. Run migrations: add `"postinstall": "prisma generate && prisma migrate deploy"` to server package.json
-
-Deploy frontend to Vercel:
-1. Import GitHub repo → set root to `client`
-2. Set `VITE_API_URL` to your Railway backend URL
+| Layer | Technology |
+|-------|-----------|
+| Frontend | React 18, Vite, Tailwind CSS, React Router v6, Axios |
+| Backend | Node.js, Express, Zod validation |
+| Database | PostgreSQL, Prisma ORM |
+| Auth | JWT, bcryptjs |
+| Deployment | Railway (backend + database + frontend) |
 
 ---
 
@@ -170,33 +39,139 @@ Deploy frontend to Vercel:
 
 ```
 team-task-manager/
-├── server/
-│   ├── prisma/
-│   │   ├── schema.prisma
-│   │   └── seed.js
+├── client/                     # React frontend
 │   └── src/
-│       ├── controllers/
-│       │   ├── authController.js
-│       │   ├── projectController.js
-│       │   └── taskController.js
-│       ├── middleware/
-│       │   └── auth.js
-│       ├── routes/
-│       │   ├── auth.js
-│       │   ├── projects.js
-│       │   └── tasks.js
-│       ├── lib/
-│       │   └── prisma.js
-│       └── index.js
-└── client/
+│       ├── api/axios.js        # Axios instance with auth headers
+│       ├── context/
+│       │   ├── AuthContext.jsx # Global auth state
+│       │   └── ToastContext.jsx
+│       ├── components/
+│       │   └── Layout.jsx      # Navbar + page wrapper
+│       └── pages/
+│           ├── Login.jsx
+│           ├── Register.jsx
+│           ├── Dashboard.jsx   # Stats + recent activity
+│           ├── Projects.jsx    # Project list
+│           └── ProjectDetail.jsx # Kanban board + members
+│
+└── server/                     # Express backend
+    ├── prisma/
+    │   ├── schema.prisma       # DB models
+    │   └── seed.js             # Demo data
     └── src/
-        ├── api/axios.js
-        ├── context/AuthContext.jsx
-        ├── components/Layout.jsx
-        └── pages/
-            ├── Login.jsx
-            ├── Register.jsx
-            ├── Dashboard.jsx
-            ├── Projects.jsx
-            └── ProjectDetail.jsx
+        ├── controllers/        # authController, projectController, taskController
+        ├── middleware/auth.js  # JWT verification
+        ├── routes/             # auth, projects, tasks
+        └── index.js
 ```
+
+---
+
+## API Reference
+
+### Auth
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| POST | `/api/auth/register` | Public | Register new user |
+| POST | `/api/auth/login` | Public | Login, returns JWT |
+| GET | `/api/auth/me` | Auth | Get current user |
+
+### Projects
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/api/projects` | Auth | List all projects for user |
+| POST | `/api/projects` | Admin | Create project |
+| GET | `/api/projects/:id` | Auth | Get project with tasks & members |
+| DELETE | `/api/projects/:id` | Admin | Delete project |
+| POST | `/api/projects/:id/members` | Admin | Add member by email |
+| DELETE | `/api/projects/:id/members/:userId` | Admin | Remove member |
+
+### Tasks
+| Method | Endpoint | Access | Description |
+|--------|----------|--------|-------------|
+| GET | `/api/tasks/dashboard` | Auth | Dashboard stats |
+| GET | `/api/tasks/project/:projectId` | Auth | Tasks for a project |
+| POST | `/api/tasks/project/:projectId` | Admin | Create task |
+| PATCH | `/api/tasks/:id` | Auth | Update task |
+| DELETE | `/api/tasks/:id` | Admin | Delete task |
+
+---
+
+## Database Schema
+
+```
+User           — id, name, email, password, role (ADMIN | MEMBER)
+Project        — id, name, description, adminId, completionStatus, completedAt
+ProjectMember  — projectId, userId (join table)
+Task           — id, title, description, status, dueDate, assigneeId, projectId
+```
+
+Task statuses: `TODO` → `IN_PROGRESS` → `PENDING_CONFIRMATION` → `DONE`
+
+Project statuses: `ACTIVE` | `COMPLETED` | `ON_HOLD`
+
+---
+
+## Local Setup
+
+### Prerequisites
+- Node.js 18+
+- PostgreSQL database (local or a free Railway instance)
+
+### 1. Clone the repo
+```bash
+git clone https://github.com/yourusername/team-task-manager.git
+cd team-task-manager
+```
+
+### 2. Backend
+```bash
+cd server
+npm install
+```
+
+Create `server/.env`:
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/taskmanager"
+JWT_SECRET="your-secret-key"
+PORT=5000
+CLIENT_URL="http://localhost:5173"
+```
+
+```bash
+npx prisma migrate dev --name init   # run migrations
+npm run db:seed                      # seed demo accounts
+npm run dev                          # start server on :5000
+```
+
+### 3. Frontend
+```bash
+cd ../client
+npm install
+```
+
+Create `client/.env`:
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+```bash
+npm run dev   # start on http://localhost:5173
+```
+
+---
+
+## Environment Variables
+
+### Server
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret key for signing tokens |
+| `PORT` | Server port (default: 5000) |
+| `CLIENT_URL` | Frontend URL for CORS |
+
+### Client
+| Variable | Description |
+|----------|-------------|
+| `VITE_API_URL` | Backend API base URL |
